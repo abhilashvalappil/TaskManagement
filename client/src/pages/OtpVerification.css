@@ -1,0 +1,132 @@
+/* OtpVerification.css */
+.otp-verification-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f3f4f6;
+    /* Light gray background */
+    padding: 20px;
+}
+
+.otp-verification-card {
+    background-color: #ffffff;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    /* Soft shadow */
+    border-radius: 16px;
+    /* Rounded corners */
+    padding: 40px;
+    width: 100%;
+    max-width: 480px;
+    /* Slightly wider for centered content */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.otp-verification-card:hover {
+    transform: translateY(-2px);
+    /* Subtle hover lift */
+}
+
+.otp-title {
+    font-size: 1.875rem;
+    /* 30px */
+    font-weight: 700;
+    color: #111827;
+    /* Gray 900 */
+    margin-bottom: 8px;
+}
+
+.otp-subtitle {
+    font-size: 1rem;
+    color: #6b7280;
+    /* Gray 500 */
+    line-height: 1.5;
+}
+
+.otp-email-highlight {
+    font-weight: 600;
+    color: #4f46e5;
+    /* Primary color */
+}
+
+.otp-verify-btn {
+    background-color: #4f46e5;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    width: 100%;
+    /* Full width button */
+    margin-top: 16px;
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.1), 0 2px 4px -1px rgba(79, 70, 229, 0.06);
+}
+
+.otp-verify-btn:hover:not(:disabled) {
+    background-color: #4338ca;
+    /* Darker shade on hover */
+    transform: translateY(-1px);
+}
+
+.otp-verify-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.otp-verify-btn:disabled {
+    background-color: #a5b4fc;
+    /* Light purple for disabled state */
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.otp-resend-text {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 16px;
+}
+
+.otp-resend-link {
+    color: #4f46e5;
+    font-weight: 600;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 4px;
+    transition: color 0.2s ease;
+}
+
+.otp-resend-link:hover {
+    color: #4338ca;
+    text-decoration: underline;
+}
+
+.otp-resend-link:disabled {
+    color: #9ca3af;
+    cursor: not-allowed;
+    text-decoration: none;
+}
+
+/* Success/Error message helpers if needed outside the component */
+.otp-message-success {
+    color: #10b981;
+    /* Green 500 */
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-top: 8px;
+}
+
+.otp-message-error {
+    color: #ef4444;
+    /* Red 500 */
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-top: 8px;
+}

@@ -1,0 +1,1 @@
+{"version":3,"file":"ITaskRepository.d.ts","sourceRoot":"","sources":["../../../src/interfaces/repositoryInterfaces/ITaskRepository.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,EAAE,MAAM,mBAAmB,CAAC;AAE1C,MAAM,WAAW,eAAe;IAC5B,MAAM,CAAC,IAAI,EAAE,OAAO,CAAC,KAAK,CAAC,GAAG,OAAO,CAAC,KAAK,CAAC,CAAC;CAChD"}

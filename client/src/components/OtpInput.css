@@ -1,0 +1,110 @@
+/* OtpInput.css */
+.otp-input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.otp-input-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    /* Space between input boxes */
+    width: 100%;
+}
+
+.otp-input-box {
+    width: 48px;
+    height: 56px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    border: 1px solid #d1d5db;
+    /* Light gray border */
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #111827;
+    /* Dark text */
+    transition: all 0.2s ease-in-out;
+    outline: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    /* Subtle shadow */
+}
+
+/* Focus state */
+.otp-input-box:focus {
+    border-color: #4f46e5;
+    /* Primary color */
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    /* Ring effect */
+    transform: translateY(-2px);
+    /* Slight lift */
+}
+
+/* Filled state */
+.otp-input-box.otp-input-filled {
+    border-color: #4f46e5;
+    background-color: #f8fafc;
+    /* Very light background for filled */
+}
+
+/* Error state */
+.otp-input-wrapper.otp-input-error .otp-input-box {
+    border-color: #ef4444;
+    /* Red border */
+    color: #ef4444;
+}
+
+.otp-input-wrapper.otp-input-error .otp-input-box:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+/* Disabled state */
+.otp-input-box.otp-input-disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+    border-color: #e5e7eb;
+}
+
+/* Error message styling */
+.otp-error-message {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #ef4444;
+    font-size: 0.875rem;
+    font-weight: 500;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.otp-error-icon {
+    font-size: 1rem;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .otp-input-box {
+        width: 40px;
+        height: 48px;
+        font-size: 1.25rem;
+    }
+
+    .otp-input-wrapper {
+        gap: 6px;
+    }
+}
