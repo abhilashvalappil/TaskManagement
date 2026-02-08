@@ -131,6 +131,34 @@
   margin-top: 4px;
 }
 
+.server-error {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 0.875rem;
+  text-align: center;
+  border: 1px solid #fecaca;
+}
+
+.google-login-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.loading-screen {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #4f46e5;
+  background: #f5f7fb;
+}
+
 /* Dashboard Layout */
 .dashboard-layout {
   display: flex;
@@ -160,8 +188,14 @@
 .sidebar-logo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #4f46e5;
+  color: #0066ff;
   margin: 0;
+}
+
+.sidebar-tagline {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 4px 0 0 0;
 }
 
 .sidebar-nav {
@@ -197,8 +231,12 @@
 
 .nav-item.active .nav-link {
   background: #eef2ff;
-  color: #4f46e5;
-  border-right: 3px solid #4f46e5;
+  color: #0066ff;
+  border-radius: 8px;
+}
+
+.nav-item.active .nav-icon svg {
+  stroke: #0066ff;
 }
 
 .nav-icon {
@@ -215,6 +253,35 @@
 .sidebar-footer {
   padding: 16px;
   border-top: 1px solid #e5e7eb;
+  margin-top: auto;
+}
+
+.logout-wrapper {
+  margin-top: 16px;
+}
+
+.logout-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  color: #6b7280;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.logout-btn:hover .nav-icon svg {
+  stroke: #ef4444;
 }
 
 .user-profile {
@@ -1110,3 +1177,30 @@
   }
 }
 
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+  color: #6b7280;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.divider:not(:empty)::before {
+  margin-right: .5em;
+}
+
+.divider:not(:empty)::after {
+  margin-left: .5em;
+}
+
+.divider span {
+  font-size: 0.85rem;
+  font-weight: 500;
+}

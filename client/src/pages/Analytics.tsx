@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { getAnalytics } from "../api/tasks/taskService";
-import "./Analytics.css";
+import "../styles/Analytics.css";
 
 const Analytics: React.FC = () => {
     const [analyticsData, setAnalyticsData] = useState<any>(null);

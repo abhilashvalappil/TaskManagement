@@ -5,7 +5,7 @@ import { setUser } from "../redux/slices/authSlice";
 import API from "../utils/axiosInstance";
 import { updateProfile } from "../api/auth/authService";
 import { useNavigate } from "react-router-dom";
-import "./Profile.css";
+import "../styles/Profile.css";
 
 const Profile: React.FC = () => {
     const user = useSelector((state: any) => state.auth.user);

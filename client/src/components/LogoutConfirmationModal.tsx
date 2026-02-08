@@ -1,5 +1,5 @@
 import React from 'react';
-import './LogoutConfirmationModal.css';
+import '../styles/LogoutConfirmationModal.css';
 
 interface LogoutConfirmationModalProps {
     isOpen: boolean;
