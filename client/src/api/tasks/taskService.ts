@@ -65,6 +65,19 @@ export const updateTask = async (taskId: string, taskData: any) => {
     return response.data;
 };
 
+export const completeTask = async (taskId: string) => {
+    const formData = new FormData();
+    formData.append('status', 'completed');
+
+    const response = await API.put(`${taskENDPOINTS.UPDATE_TASK}/${taskId}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+
+    return response.data;
+};
+
 export const getTasks = async () => {
     const response = await API.get(taskENDPOINTS.GET_TASKS);
     return response.data;
@@ -72,5 +85,10 @@ export const getTasks = async () => {
 
 export const deleteTask = async (taskId: string) => {
     const response = await API.delete(`${taskENDPOINTS.DELETE_TASK}/${taskId}`);
+    return response.data;
+};
+
+export const getAnalytics = async () => {
+    const response = await API.get(taskENDPOINTS.GET_ANALYTICS);
     return response.data;
 };
