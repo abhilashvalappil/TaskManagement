@@ -24,3 +24,9 @@ export interface UserResponse {
     email: string;
     fullName: string;
 }
+
+export interface UpdateProfileResponse {
+    id: string;
+    email: string;
+    fullName: string;
+}

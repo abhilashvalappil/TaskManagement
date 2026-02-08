@@ -1,10 +1,10 @@
-import { SignInResult, VerifyOtpResult } from "../../types/authTypes";
+import { SignInResult, UserResponse, VerifyOtpResult } from "../../types/authTypes";
 
 export interface IAuthService {
     signUp(fullName: string, email: string, password: string, confirmPassword: string): Promise<{ message: string; expiresIn: number }>;
     verifyOtp(email: string, otp: string): Promise<VerifyOtpResult>;
     signIn(email: string, password: string): Promise<SignInResult>;
     googleSignIn(token: string): Promise<SignInResult>;
-    getUserById(userId: string): Promise<any>;
+    getUserById(userId: string): Promise<UserResponse>;
     updateProfile(userId: string, fullName: string): Promise<any>;
 }
