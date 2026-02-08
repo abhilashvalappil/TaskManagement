@@ -37,8 +37,17 @@ const TaskSchema: Schema<ITask> = new Schema({
         ref: 'User',
         required: true,
     },
+    completedAt: {
+        type: Date,
+    },
 }, {
     timestamps: true,
+});
+
+TaskSchema.pre('save', async function () {
+    if (this.isModified('status') && this.status === 'completed') {
+        this.completedAt = new Date();
+    }
 });
 
 export default mongoose.model<ITask>('Task', TaskSchema);

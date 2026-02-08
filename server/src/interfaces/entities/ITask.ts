@@ -9,7 +9,8 @@ export interface ITask extends Document {
     dueDate?: Date;
     assignees: string[];
     attachments: string[];
-    userId: Types.ObjectId;  
+    userId: Types.ObjectId;
     createdAt?: Date;
     updatedAt?: Date;
+    completedAt?: Date;
 }

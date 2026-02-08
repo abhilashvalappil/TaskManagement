@@ -6,4 +6,5 @@ export interface ITaskRepository {
     findByUserId(userId: string): Promise<ITask[]>;
     updateTask(taskId: string, userId: string,updateData: UpdateTaskData): Promise<ITask | null>;
     deleteTask(taskId: string, userId: string): Promise<boolean>;
+    getAnalytics(userId: string): Promise<any>;
 }

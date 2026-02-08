@@ -4,4 +4,7 @@ export interface IAuthService {
     signUp(fullName: string, email: string, password: string, confirmPassword: string): Promise<{ message: string; expiresIn: number }>;
     verifyOtp(email: string, otp: string): Promise<VerifyOtpResult>;
     signIn(email: string, password: string): Promise<SignInResult>;
+    googleSignIn(token: string): Promise<SignInResult>;
+    getUserById(userId: string): Promise<any>;
+    updateProfile(userId: string, fullName: string): Promise<any>;
 }

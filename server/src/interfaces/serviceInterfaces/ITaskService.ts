@@ -6,4 +6,5 @@ export interface ITaskService {
     getTasks(userId: string): Promise<{tasks: ITask[]}>;
     updateTask(taskId: string, userId: string,updateData: UpdateTaskRequest,files: Express.Multer.File[]): Promise<ITask | null>
     deleteTask(taskId: string, userId: string): Promise<boolean>
+    getAnalytics(userId: string): Promise<any>
 }
