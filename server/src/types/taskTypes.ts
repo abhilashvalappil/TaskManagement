@@ -18,4 +18,25 @@ export interface CreateTaskResult {
     task: ITask;
 }
 
+export interface UpdateTaskData {
+    title?: string;
+    description?: string;
+    priority?: "low" | "medium" | "high";
+    status?: "pending" | "in_progress" | "completed";
+    dueDate?: Date;
+    assignees?: string[];
+    attachments?: string[];
+}
+
+export interface UpdateTaskRequest {
+    title?: string;
+    description?: string;
+    priority?: "low" | "medium" | "high";
+    status?: "pending" | "in_progress" | "completed";
+    dueDate?: string;              
+    assignees?: string[];
+    existingAttachments?: string[]; 
+}
+
+
  

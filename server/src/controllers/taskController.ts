@@ -27,7 +27,6 @@ export class TaskController {
             const userId = req.user.userId;
             const files = req.files as Express.Multer.File[];
 
-            // Handle assignees and attachments which might be JSON strings or arrays in multipart/form-data
             let parsedAssignees = assignees;
             if (typeof assignees === 'string') {
                 try {
@@ -76,6 +75,41 @@ export class TaskController {
             const userId = req.user.userId;
             const result = await this.taskService.getTasks(userId);
             res.status(200).json(result.tasks)
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async updateTask(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+        try {
+            if (!req.user?.userId) {
+                res.status(401).json({ error: "Unauthorized" });
+                return;
+            }
+            
+            const rawTaskId = req.params.id;
+            if (!rawTaskId || Array.isArray(rawTaskId)) {
+                res.status(400).json({ error: "Invalid Task ID" });
+                return;
+            }
+
+            const taskId: string = rawTaskId;
+
+            const userId = req.user.userId;
+
+            const updateData = {
+            ...req.body,
+            assignees: req.body.assignees
+                ? JSON.parse(req.body.assignees)
+                : [],
+            existingAttachments: req.body.existingAttachments
+                ? JSON.parse(req.body.existingAttachments)
+                : [],
+        };
+
+        const files = req.files as Express.Multer.File[];
+        const task = await this.taskService.updateTask(taskId,userId,updateData,files);
+            res.status(200).json(task)
         } catch (error) {
             next(error);
         }

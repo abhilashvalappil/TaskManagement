@@ -8,4 +8,5 @@ export const commonENDPOINTS = {
 export const taskENDPOINTS = {
     CREATE_TASK: '/tasks',
     GET_TASKS: '/tasks',
+    UPDATE_TASK: '/tasks',  
 }

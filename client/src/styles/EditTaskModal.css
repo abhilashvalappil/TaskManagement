@@ -1,0 +1,58 @@
+.attachments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.attachments-list.existing {
+    margin-bottom: 8px;
+}
+
+.btn-update-task {
+    flex: 1;
+    background: #0066ff;
+    color: #ffffff;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-update-task:hover {
+    background: #0052cc;
+}
+
+.uploaded-file-item .file-preview {
+    background: #f3f4f6;
+    color: #9ca3af;
+}
+
+.uploaded-file-item .file-info .file-name {
+    color: #374151;
+    font-weight: 500;
+}
+
+/* Ensure modal content handles the scroll if form is long */
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}

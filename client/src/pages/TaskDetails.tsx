@@ -12,7 +12,9 @@ import {
     Download,
     MessageSquare
 } from "lucide-react";
-import "./TaskDetails.css";
+import "../styles/TaskDetails.css";
+import EditTaskModal from "../components/EditTaskModal";
+import { useState } from "react";
 
 interface Attachment {
     id: string;
@@ -36,7 +38,7 @@ interface Task {
     priority: "low" | "medium" | "high";
     dueDate: string;
     assignees: string[];
-    attachments: Attachment[];
+    attachments: string[];
     comments: Comment[];
     createdAt: string;
     updatedAt: string;
@@ -45,18 +47,19 @@ interface Task {
 interface TaskDetailsProps {
     task?: Task;
     onBack?: () => void;
-    onEdit?: (id: string) => void;
     onDelete?: (id: string) => void;
     onMarkComplete?: (id: string) => void;
+    onUpdate?: (id: string, data: any) => void;
 }
 
 const TaskDetails: React.FC<TaskDetailsProps> = ({
     task,
     onBack,
-    onEdit,
     onDelete,
-    onMarkComplete
+    onMarkComplete,
+    onUpdate
 }) => {
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     // Merge provided task with defaults to ensure all fields exist
     const defaultTask: Task = {
         _id: "mock-1",
@@ -66,10 +69,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({
         priority: "medium",
         dueDate: "Not set",
         assignees: ["Unassigned"],
-        attachments: [
-            { id: "1", name: "Screenshot 1.png", url: "#" },
-            { id: "2", name: "Screenshot 2.png", url: "#" }
-        ],
+        attachments: [],
         comments: [],
         createdAt: "Recently",
         updatedAt: "Just now"
@@ -77,15 +77,56 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({
 
     const currentTask = task ? { ...defaultTask, ...task } : defaultTask;
 
-    // Handle attachments if they are passed as count from Tasks.tsx
+    // Parse attachments from string array to Attachment objects
     const attachmentItems: Attachment[] = Array.isArray(currentTask.attachments)
-        ? currentTask.attachments
-        : Array.from({ length: typeof currentTask.attachments === 'number' ? currentTask.attachments : 0 }, (_, i) => ({
-            id: `attach-${i}`,
-            name: `Attachment ${i + 1}`,
-            url: "#",
-            previewUrl: ""
-        }));
+        ? currentTask.attachments.map((url: string, index: number) => {
+            const fileName = url.split('/').pop() || `Attachment ${index + 1}`;
+            const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+            return {
+                id: `attach-${index}`,
+                name: fileName,
+                url: url,
+                previewUrl: isImage ? url : undefined
+            };
+        })
+        : [];
+
+    const handleViewAttachment = (url: string) => {
+        window.open(url, "_blank", "noopener,noreferrer");
+    };
+
+    const handleDownloadAttachment = async (url: string, fileName: string) => {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = blobUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            console.error("Download failed", error);
+            // Fallback: just open in new tab
+            window.open(url, "_blank");
+        }
+    };
+
+    const formatDate = (date?: string) => {
+    if (!date) return "Not set";
+
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "Invalid date";
+
+    return d.toLocaleDateString("en-US", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    });
+};
+
 
     return (
         <div className="task-details-container">
@@ -97,7 +138,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({
                     <h1>Task Details</h1>
                 </div>
                 <div className="header-right">
-                    <button className="action-btn" onClick={() => onEdit?.(currentTask._id)}>
+                    <button className="action-btn" onClick={() => setIsEditModalOpen(true)}>
                         <Edit2 size={18} />
                     </button>
                     <button className="action-btn delete-btn" onClick={() => onDelete?.(currentTask._id)}>
@@ -157,7 +198,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({
                         </div>
                         <div className="info-content">
                             <span className="info-label">Last Updated</span>
-                            <span className="info-value">{currentTask.updatedAt}</span>
+                            <span className="info-value">{formatDate(currentTask.updatedAt)}</span>
                         </div>
                     </div>
                 </div>
@@ -173,12 +214,30 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({
                         {attachmentItems.map((attach) => (
                             <div key={attach.id} className="attachment-card">
                                 <div className="attachment-preview">
-                                    {attach.previewUrl ? <img src={attach.previewUrl} alt="" /> : null}
+                                    {attach.previewUrl ? (
+                                        <img src={attach.previewUrl} alt="" />
+                                    ) : (
+                                        <div className="file-icon-placeholder">
+                                            <Paperclip size={32} />
+                                        </div>
+                                    )}
                                 </div>
                                 <span className="attachment-name">{attach.name}</span>
                                 <div className="attachment-actions">
-                                    <button className="attach-action-btn"><Eye size={16} /></button>
-                                    <button className="attach-action-btn"><Download size={16} /></button>
+                                    <button
+                                        className="attach-action-btn"
+                                        title="View"
+                                        onClick={() => handleViewAttachment(attach.url)}
+                                    >
+                                        <Eye size={16} />
+                                    </button>
+                                    <button
+                                        className="attach-action-btn"
+                                        title="Download"
+                                        onClick={() => handleDownloadAttachment(attach.url, attach.name)}
+                                    >
+                                        <Download size={16} />
+                                    </button>
                                 </div>
                             </div>
                         ))}
@@ -205,6 +264,16 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({
                     Created on {currentTask.createdAt}
                 </div>
             </div>
+
+            <EditTaskModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                task={currentTask as any}
+                onSubmit={(id, data) => {
+                    onUpdate?.(id, data);
+                    setIsEditModalOpen(false);
+                }}
+            />
         </div>
     );
 };

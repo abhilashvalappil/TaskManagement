@@ -1,5 +1,5 @@
 import React, { useState, useRef, KeyboardEvent, ClipboardEvent, ChangeEvent } from 'react';
-import './OtpInput.css';
+import '../styles/OtpInput.css';
 
 interface OtpInputProps {
     length?: number;

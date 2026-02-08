@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import OtpInput from '../components/OtpInput';
 import { verifyOtp } from '../api/auth/authService';
-import './OtpVerification.css';
+import '../styles/OtpVerification.css';
 
 interface LocationState {
     email: string;

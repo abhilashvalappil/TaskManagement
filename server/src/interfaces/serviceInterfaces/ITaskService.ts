@@ -1,7 +1,8 @@
-import { CreateTaskData, CreateTaskResult } from "../../types/taskTypes";
+import { CreateTaskData, CreateTaskResult, UpdateTaskData, UpdateTaskRequest } from "../../types/taskTypes";
 import { ITask } from "../entities/ITask";
 
 export interface ITaskService {
     createTask(taskData: CreateTaskData): Promise<CreateTaskResult>;
     getTasks(userId: string): Promise<{tasks: ITask[]}>;
+    updateTask(taskId: string, userId: string,updateData: UpdateTaskRequest,files: Express.Multer.File[]): Promise<ITask | null>
 }

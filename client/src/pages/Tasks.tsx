@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import CreateTaskModal from "../components/CreateTaskModal";
-import { getTasks, createTask } from "../api/tasks/taskService";
+import { getTasks, createTask, updateTask } from "../api/tasks/taskService";
 import TaskDetails from "./TaskDetails";
 
 interface Task {
@@ -12,7 +12,7 @@ interface Task {
     priority: "low" | "medium" | "high";
     createdDate: string;
     dueDate: string;
-    attachments: number;
+    attachments: string[];
 }
 
 const Tasks: React.FC = () => {
@@ -63,6 +63,16 @@ const Tasks: React.FC = () => {
             fetchTasks();
         } catch (error) {
             console.error("Failed to create task", error);
+        }
+    };
+
+    const handleUpdateTask = async (taskId: string, taskData: any) => {
+        try {
+            await updateTask(taskId, taskData);
+            fetchTasks(); // Refresh list
+            setSelectedTask(null); // Close details
+        } catch (error) {
+            console.error("Failed to update task", error);
         }
     };
 
@@ -191,10 +201,10 @@ const Tasks: React.FC = () => {
                                         </span>
                                         <span className="task-date">📅 Due: {task.dueDate}</span>
                                     </div>
-                                    {task.attachments > 0 && (
+                                    {task.attachments && task.attachments.length > 0 && (
                                         <div className="task-attachments">
                                             <span className="attachment-icon">📎</span>
-                                            {task.attachments}
+                                            {task.attachments.length}
                                         </div>
                                     )}
                                 </div>
@@ -228,6 +238,7 @@ const Tasks: React.FC = () => {
                             // Implement delete logic here if needed
                             setSelectedTask(null);
                         }}
+                        onUpdate={handleUpdateTask}
                     />
                 </div>
             )}

@@ -1,7 +1,7 @@
 import { uploadToCloudinary } from "../utils/cloudinary";
 import { ITaskRepository } from "../interfaces/repositoryInterfaces/ITaskRepository";
 import { ITaskService } from "../interfaces/serviceInterfaces/ITaskService";
-import { CreateTaskData, CreateTaskResult } from "../types/taskTypes";
+import { CreateTaskData, CreateTaskResult, UpdateTaskData, UpdateTaskRequest } from "../types/taskTypes";
 import { ITask } from "../interfaces/entities/ITask";
 
 
@@ -25,8 +25,7 @@ export class TaskService implements ITaskService {
             attachments: [...(taskData.attachments || []), ...uploadedUrls],
         };
 
-        // Remove 'files' property as it is not part of the ITask interface and shouldn't be passed to repository
-        if ('files' in taskToCreate) {
+         if ('files' in taskToCreate) {
             delete (taskToCreate as any).files;
         }
 
@@ -40,5 +39,31 @@ export class TaskService implements ITaskService {
     async getTasks(userId: string): Promise<{tasks: ITask[]}> {
         const tasks = await this.taskRepository.findByUserId(userId);
         return { tasks }
+    }
+
+    async updateTask(taskId: string, userId: string,updateData: UpdateTaskRequest,files: Express.Multer.File[]): Promise<ITask | null> {
+        let uploadedUrls: string[] = [];
+    if (files && files.length > 0) {
+        const uploadPromises = files.map(file =>
+            uploadToCloudinary(file.buffer)
+        );
+        uploadedUrls = await Promise.all(uploadPromises);
+    }
+
+    const finalAttachments = [
+        ...(updateData.existingAttachments ?? []),
+        ...uploadedUrls,
+    ];
+
+    const payload: UpdateTaskData = {
+        ...(updateData.title !== undefined && { title: updateData.title }),
+        ...(updateData.description !== undefined && { description: updateData.description }),
+        ...(updateData.priority !== undefined && { priority: updateData.priority }),
+        ...(updateData.status !== undefined && { status: updateData.status }),
+        ...(updateData.dueDate !== undefined && { dueDate: new Date(updateData.dueDate) }),
+        ...(updateData.assignees !== undefined && { assignees: updateData.assignees }),
+        attachments: finalAttachments,
+    };
+    return await this.taskRepository.updateTask(taskId, userId,payload);
     }
 }
