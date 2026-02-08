@@ -4,13 +4,13 @@ import TaskModel from "../models/taskModel";
 import { UpdateTaskData } from "../types/taskTypes";
 
 class TaskRepository implements ITaskRepository {
-    constructor(){  
+    constructor() {
     }
 
     async create(task: Partial<ITask>): Promise<ITask> {
         const newTask = new TaskModel(task);
         return await newTask.save();
-    }   
+    }
 
     async findByUserId(userId: string): Promise<ITask[]> {
         return await TaskModel.find({ userId });
@@ -18,6 +18,11 @@ class TaskRepository implements ITaskRepository {
 
     async updateTask(taskId: string, userId: string,updateData: UpdateTaskData): Promise<ITask | null> {
         return await TaskModel.findOneAndUpdate({ _id: taskId, userId },updateData,{new:true});
+    }
+
+    async deleteTask(taskId: string, userId: string): Promise<boolean> {
+        const result = await TaskModel.deleteOne({ _id: taskId, userId });
+        return result.deletedCount > 0;
     }
 }
 

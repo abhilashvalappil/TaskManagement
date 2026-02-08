@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import "../styles/TaskDetails.css";
 import EditTaskModal from "../components/EditTaskModal";
+import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 import { useState } from "react";
 
 interface Attachment {
@@ -60,6 +61,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({
     onUpdate
 }) => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     // Merge provided task with defaults to ensure all fields exist
     const defaultTask: Task = {
         _id: "mock-1",
@@ -115,17 +117,17 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({
     };
 
     const formatDate = (date?: string) => {
-    if (!date) return "Not set";
+        if (!date) return "Not set";
 
-    const d = new Date(date);
-    if (isNaN(d.getTime())) return "Invalid date";
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return "Invalid date";
 
-    return d.toLocaleDateString("en-US", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-    });
-};
+        return d.toLocaleDateString("en-US", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+        });
+    };
 
 
     return (
@@ -141,7 +143,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({
                     <button className="action-btn" onClick={() => setIsEditModalOpen(true)}>
                         <Edit2 size={18} />
                     </button>
-                    <button className="action-btn delete-btn" onClick={() => onDelete?.(currentTask._id)}>
+                    <button className="action-btn delete-btn" onClick={() => setIsDeleteModalOpen(true)}>
                         <Trash2 size={18} />
                     </button>
                 </div>
@@ -273,6 +275,16 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({
                     onUpdate?.(id, data);
                     setIsEditModalOpen(false);
                 }}
+            />
+
+            <DeleteConfirmationModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={() => {
+                    onDelete?.(currentTask._id);
+                    setIsDeleteModalOpen(false);
+                }}
+                taskTitle={currentTask.title}
             />
         </div>
     );

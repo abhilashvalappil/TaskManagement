@@ -5,4 +5,5 @@ export interface ITaskRepository {
     create(task: Partial<ITask>): Promise<ITask>;
     findByUserId(userId: string): Promise<ITask[]>;
     updateTask(taskId: string, userId: string,updateData: UpdateTaskData): Promise<ITask | null>;
+    deleteTask(taskId: string, userId: string): Promise<boolean>;
 }

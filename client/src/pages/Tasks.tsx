@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import CreateTaskModal from "../components/CreateTaskModal";
-import { getTasks, createTask, updateTask } from "../api/tasks/taskService";
+import { getTasks, createTask, updateTask, deleteTask } from "../api/tasks/taskService";
 import TaskDetails from "./TaskDetails";
 
 interface Task {
@@ -59,7 +59,6 @@ const Tasks: React.FC = () => {
     const handleCreateTask = async (taskData: any) => {
         try {
             await createTask(taskData);
-            // Refresh tasks after creation
             fetchTasks();
         } catch (error) {
             console.error("Failed to create task", error);
@@ -69,10 +68,20 @@ const Tasks: React.FC = () => {
     const handleUpdateTask = async (taskId: string, taskData: any) => {
         try {
             await updateTask(taskId, taskData);
-            fetchTasks(); // Refresh list
-            setSelectedTask(null); // Close details
+            fetchTasks(); 
+            setSelectedTask(null); 
         } catch (error) {
             console.error("Failed to update task", error);
+        }
+    };
+
+    const handleDeleteTask = async (taskId: string) => {
+        try {
+            await deleteTask(taskId);
+            fetchTasks(); 
+            setSelectedTask(null); 
+        } catch (error) {
+            console.error("Failed to delete task", error);
         }
     };
 
@@ -234,10 +243,7 @@ const Tasks: React.FC = () => {
                     <TaskDetails
                         task={selectedTask as any}
                         onBack={() => setSelectedTask(null)}
-                        onDelete={() => {
-                            // Implement delete logic here if needed
-                            setSelectedTask(null);
-                        }}
+                        onDelete={handleDeleteTask}
                         onUpdate={handleUpdateTask}
                     />
                 </div>

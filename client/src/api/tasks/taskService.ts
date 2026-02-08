@@ -69,3 +69,8 @@ export const getTasks = async () => {
     const response = await API.get(taskENDPOINTS.GET_TASKS);
     return response.data;
 };
+
+export const deleteTask = async (taskId: string) => {
+    const response = await API.delete(`${taskENDPOINTS.DELETE_TASK}/${taskId}`);
+    return response.data;
+};

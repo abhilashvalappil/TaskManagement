@@ -20,7 +20,7 @@ export class TaskController {
                 res.status(400).json({ error: "Title, description, priority, and dueDate are required" })
                 return;
             }
-             if (!req.user?.userId) {
+            if (!req.user?.userId) {
                 res.status(401).json({ error: "Unauthorized" });
                 return;
             }
@@ -86,7 +86,7 @@ export class TaskController {
                 res.status(401).json({ error: "Unauthorized" });
                 return;
             }
-            
+
             const rawTaskId = req.params.id;
             if (!rawTaskId || Array.isArray(rawTaskId)) {
                 res.status(400).json({ error: "Invalid Task ID" });
@@ -98,18 +98,45 @@ export class TaskController {
             const userId = req.user.userId;
 
             const updateData = {
-            ...req.body,
-            assignees: req.body.assignees
-                ? JSON.parse(req.body.assignees)
-                : [],
-            existingAttachments: req.body.existingAttachments
-                ? JSON.parse(req.body.existingAttachments)
-                : [],
-        };
+                ...req.body,
+                assignees: req.body.assignees
+                    ? JSON.parse(req.body.assignees)
+                    : [],
+                existingAttachments: req.body.existingAttachments
+                    ? JSON.parse(req.body.existingAttachments)
+                    : [],
+            };
 
-        const files = req.files as Express.Multer.File[];
+            const files = req.files as Express.Multer.File[];
         const task = await this.taskService.updateTask(taskId,userId,updateData,files);
             res.status(200).json(task)
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async deleteTask(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+        try {
+            if (!req.user?.userId) {
+                res.status(401).json({ error: "Unauthorized" });
+                return;
+            }
+
+            const rawTaskId = req.params.id;
+            if (!rawTaskId || Array.isArray(rawTaskId)) {
+                res.status(400).json({ error: "Invalid Task ID" });
+                return;
+            }
+
+            const taskId: string = rawTaskId;
+            const userId = req.user.userId;
+
+            const success = await this.taskService.deleteTask(taskId, userId);
+            if (success) {
+                res.status(200).json({ success: true, message: "Task deleted successfully" });
+            } else {
+                res.status(404).json({ error: "Task not found" });
+            }
         } catch (error) {
             next(error);
         }
