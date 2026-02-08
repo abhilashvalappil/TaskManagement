@@ -10,4 +10,5 @@ export const taskENDPOINTS = {
     GET_TASKS: '/tasks',
     UPDATE_TASK: '/tasks',
     DELETE_TASK: '/tasks',
+    GET_ANALYTICS: '/tasks/analytics',
 }
