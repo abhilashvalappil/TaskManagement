@@ -14,7 +14,6 @@ export class TaskController {
 
     async createTask(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
         try {
-            console.log(req.body);
             const { title, description, priority, dueDate, assignees, attachments } = req.body;
             if (!title || !description || !priority || !dueDate) {
                 res.status(400).json({ error: "Title, description, priority, and dueDate are required" })
@@ -97,18 +96,32 @@ export class TaskController {
 
             const userId = req.user.userId;
 
+            let parsedAssignees = [];
+            if (req.body.assignees) {
+                try {
+                    parsedAssignees = JSON.parse(req.body.assignees);
+                } catch (e) {
+                    parsedAssignees = [req.body.assignees];
+                }
+            }
+
+            let parsedExistingAttachments = [];
+            if (req.body.existingAttachments) {
+                try {
+                    parsedExistingAttachments = JSON.parse(req.body.existingAttachments);
+                } catch (e) {
+                    parsedExistingAttachments = [req.body.existingAttachments];
+                }
+            }
+
             const updateData = {
                 ...req.body,
-                assignees: req.body.assignees
-                    ? JSON.parse(req.body.assignees)
-                    : [],
-                existingAttachments: req.body.existingAttachments
-                    ? JSON.parse(req.body.existingAttachments)
-                    : [],
+                assignees: parsedAssignees,
+                existingAttachments: parsedExistingAttachments,
             };
 
-            const files = req.files as Express.Multer.File[];
-        const task = await this.taskService.updateTask(taskId,userId,updateData,files);
+            const files = req.files as Express.Multer.File[] || [];
+            const task = await this.taskService.updateTask(taskId, userId, updateData, files);
             res.status(200).json(task)
         } catch (error) {
             next(error);
@@ -137,6 +150,20 @@ export class TaskController {
             } else {
                 res.status(404).json({ error: "Task not found" });
             }
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getAnalytics(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+        try {
+            if (!req.user?.userId) {
+                res.status(401).json({ error: "Unauthorized" });
+                return;
+            }
+            const userId = req.user.userId;
+            const analytics = await this.taskService.getAnalytics(userId);
+            res.status(200).json(analytics);
         } catch (error) {
             next(error);
         }
