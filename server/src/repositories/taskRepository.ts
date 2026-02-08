@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { ITask } from "../interfaces/entities/ITask";
 import { ITaskRepository } from "../interfaces/repositoryInterfaces/ITaskRepository";
 import TaskModel from "../models/taskModel";
@@ -16,9 +17,6 @@ class TaskRepository implements ITaskRepository {
         return await TaskModel.find({ userId });
     }
 
-    // async updateTask(taskId: string, userId: string,updateData: UpdateTaskData): Promise<ITask | null> {
-    //     return await TaskModel.findOneAndUpdate({ _id: taskId, userId },updateData,{new:true});
-    // }
     async updateTask(taskId: string, userId: string, updateData: UpdateTaskData): Promise<ITask | null> {
         if (updateData.status === 'completed') {
             (updateData as any).completedAt = new Date();
@@ -90,6 +88,6 @@ class TaskRepository implements ITaskRepository {
         return stats[0];
     }
 }
-import { Types } from "mongoose";
+
 
 export default new TaskRepository();
