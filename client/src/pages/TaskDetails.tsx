@@ -12,10 +12,11 @@ import {
     Download,
     MessageSquare
 } from "lucide-react";
-import "../styles/TaskDetails.css";
+import { useState } from "react";
+import Sidebar from "../components/Sidebar";
 import EditTaskModal from "../components/EditTaskModal";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
-import { useState } from "react";
+import "../styles/TaskDetails.css";
 
 interface Attachment {
     id: string;
@@ -131,161 +132,166 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({
 
 
     return (
-        <div className="task-details-container">
-            <header className="task-details-header">
-                <div className="header-left">
-                    <button className="back-btn" onClick={onBack}>
-                        <ArrowLeft size={20} />
-                    </button>
-                    <h1>Task Details</h1>
-                </div>
-                <div className="header-right">
-                    <button className="action-btn" onClick={() => setIsEditModalOpen(true)}>
-                        <Edit2 size={18} />
-                    </button>
-                    <button className="action-btn delete-btn" onClick={() => setIsDeleteModalOpen(true)}>
-                        <Trash2 size={18} />
-                    </button>
-                </div>
-            </header>
-
-            <div className="task-details-card">
-                <div className="task-main-info">
-                    <h2>{currentTask.title}</h2>
-                    <button
-                        className="mark-complete-btn"
-                        onClick={() => onMarkComplete?.(currentTask._id)}
-                    >
-                        <CheckCircle size={18} />
-                        Mark Complete
-                    </button>
-                </div>
-
-                <div className="task-badges-row">
-                    <span className="status-badge">
-                        {currentTask.status.charAt(0).toUpperCase() + currentTask.status.slice(1)}
-                    </span>
-                    <span className="priority-badge">
-                        {currentTask.priority.charAt(0).toUpperCase() + currentTask.priority.slice(1)} Priority
-                    </span>
-                </div>
-
-                <h3 className="section-label">Description</h3>
-                <p className="description-text">{currentTask.description}</p>
-
-                <div className="info-grid">
-                    <div className="info-item">
-                        <div className="icon-box blue">
-                            <Calendar size={24} />
+        <div className="dashboard-layout">
+            <Sidebar />
+            <main className="dashboard-main">
+                <div className="task-details-container">
+                    <header className="task-details-header">
+                        <div className="header-left">
+                            <button className="back-btn" onClick={onBack}>
+                                <ArrowLeft size={20} />
+                            </button>
+                            <h1>Task Details</h1>
                         </div>
-                        <div className="info-content">
-                            <span className="info-label">Due Date</span>
-                            <span className="info-value">{currentTask.dueDate}</span>
+                        <div className="header-right">
+                            <button className="action-btn" onClick={() => setIsEditModalOpen(true)}>
+                                <Edit2 size={18} />
+                            </button>
+                            <button className="action-btn delete-btn" onClick={() => setIsDeleteModalOpen(true)}>
+                                <Trash2 size={18} />
+                            </button>
                         </div>
-                    </div>
+                    </header>
 
-                    <div className="info-item">
-                        <div className="icon-box green">
-                            <User size={24} />
+                    <div className="task-details-card">
+                        <div className="task-main-info">
+                            <h2>{currentTask.title}</h2>
+                            <button
+                                className="mark-complete-btn"
+                                onClick={() => onMarkComplete?.(currentTask._id)}
+                            >
+                                <CheckCircle size={18} />
+                                Mark Complete
+                            </button>
                         </div>
-                        <div className="info-content">
-                            <span className="info-label">Assigned To</span>
-                            <span className="info-value">{currentTask.assignees.join(", ")}</span>
-                        </div>
-                    </div>
 
-                    <div className="info-item">
-                        <div className="icon-box gray">
-                            <Clock size={24} />
+                        <div className="task-badges-row">
+                            <span className="status-badge">
+                                {currentTask.status.charAt(0).toUpperCase() + currentTask.status.slice(1)}
+                            </span>
+                            <span className="priority-badge">
+                                {currentTask.priority.charAt(0).toUpperCase() + currentTask.priority.slice(1)} Priority
+                            </span>
                         </div>
-                        <div className="info-content">
-                            <span className="info-label">Last Updated</span>
-                            <span className="info-value">{formatDate(currentTask.updatedAt)}</span>
-                        </div>
-                    </div>
-                </div>
 
-                <section className="attachments-section">
-                    <div className="section-header-with-icon">
-                        <Paperclip size={20} />
-                        <h3 className="section-label" style={{ margin: 0 }}>Attachments</h3>
-                        <span className="count">({attachmentItems.length})</span>
-                    </div>
+                        <h3 className="section-label">Description</h3>
+                        <p className="description-text">{currentTask.description}</p>
 
-                    <div className="attachments-grid">
-                        {attachmentItems.map((attach) => (
-                            <div key={attach.id} className="attachment-card">
-                                <div className="attachment-preview">
-                                    {attach.previewUrl ? (
-                                        <img src={attach.previewUrl} alt="" />
-                                    ) : (
-                                        <div className="file-icon-placeholder">
-                                            <Paperclip size={32} />
-                                        </div>
-                                    )}
+                        <div className="info-grid">
+                            <div className="info-item">
+                                <div className="icon-box blue">
+                                    <Calendar size={24} />
                                 </div>
-                                <span className="attachment-name">{attach.name}</span>
-                                <div className="attachment-actions">
-                                    <button
-                                        className="attach-action-btn"
-                                        title="View"
-                                        onClick={() => handleViewAttachment(attach.url)}
-                                    >
-                                        <Eye size={16} />
-                                    </button>
-                                    <button
-                                        className="attach-action-btn"
-                                        title="Download"
-                                        onClick={() => handleDownloadAttachment(attach.url, attach.name)}
-                                    >
-                                        <Download size={16} />
-                                    </button>
+                                <div className="info-content">
+                                    <span className="info-label">Due Date</span>
+                                    <span className="info-value">{currentTask.dueDate}</span>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                </section>
 
-                <section className="comments-section">
-                    <div className="section-header-with-icon">
-                        <MessageSquare size={20} />
-                        <h3 className="section-label" style={{ margin: 0 }}>Comments</h3>
-                        <span className="count">({currentTask.comments.length})</span>
-                    </div>
+                            <div className="info-item">
+                                <div className="icon-box green">
+                                    <User size={24} />
+                                </div>
+                                <div className="info-content">
+                                    <span className="info-label">Assigned To</span>
+                                    <span className="info-value">{currentTask.assignees.join(", ")}</span>
+                                </div>
+                            </div>
 
-                    {currentTask.comments.length === 0 ? (
-                        <p className="empty-placeholder">No comments</p>
-                    ) : (
-                        <div className="comments-list">
-                            {/* Comments would go here */}
+                            <div className="info-item">
+                                <div className="icon-box gray">
+                                    <Clock size={24} />
+                                </div>
+                                <div className="info-content">
+                                    <span className="info-label">Last Updated</span>
+                                    <span className="info-value">{formatDate(currentTask.updatedAt)}</span>
+                                </div>
+                            </div>
                         </div>
-                    )}
-                </section>
 
-                <div className="footer-date">
-                    Created on {currentTask.createdAt}
+                        <section className="attachments-section">
+                            <div className="section-header-with-icon">
+                                <Paperclip size={20} />
+                                <h3 className="section-label" style={{ margin: 0 }}>Attachments</h3>
+                                <span className="count">({attachmentItems.length})</span>
+                            </div>
+
+                            <div className="attachments-grid">
+                                {attachmentItems.map((attach) => (
+                                    <div key={attach.id} className="attachment-card">
+                                        <div className="attachment-preview">
+                                            {attach.previewUrl ? (
+                                                <img src={attach.previewUrl} alt="" />
+                                            ) : (
+                                                <div className="file-icon-placeholder">
+                                                    <Paperclip size={32} />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <span className="attachment-name">{attach.name}</span>
+                                        <div className="attachment-actions">
+                                            <button
+                                                className="attach-action-btn"
+                                                title="View"
+                                                onClick={() => handleViewAttachment(attach.url)}
+                                            >
+                                                <Eye size={16} />
+                                            </button>
+                                            <button
+                                                className="attach-action-btn"
+                                                title="Download"
+                                                onClick={() => handleDownloadAttachment(attach.url, attach.name)}
+                                            >
+                                                <Download size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        <section className="comments-section">
+                            <div className="section-header-with-icon">
+                                <MessageSquare size={20} />
+                                <h3 className="section-label" style={{ margin: 0 }}>Comments</h3>
+                                <span className="count">({currentTask.comments.length})</span>
+                            </div>
+
+                            {currentTask.comments.length === 0 ? (
+                                <p className="empty-placeholder">No comments</p>
+                            ) : (
+                                <div className="comments-list">
+                                    {/* Comments would go here */}
+                                </div>
+                            )}
+                        </section>
+
+                        <div className="footer-date">
+                            Created on {currentTask.createdAt}
+                        </div>
+                    </div>
+
+                    <EditTaskModal
+                        isOpen={isEditModalOpen}
+                        onClose={() => setIsEditModalOpen(false)}
+                        task={currentTask as any}
+                        onSubmit={(id: string, data: any) => {
+                            onUpdate?.(id, data);
+                            setIsEditModalOpen(false);
+                        }}
+                    />
+
+                    <DeleteConfirmationModal
+                        isOpen={isDeleteModalOpen}
+                        onClose={() => setIsDeleteModalOpen(false)}
+                        onConfirm={() => {
+                            onDelete?.(currentTask._id);
+                            setIsDeleteModalOpen(false);
+                        }}
+                        taskTitle={currentTask.title}
+                    />
                 </div>
-            </div>
-
-            <EditTaskModal
-                isOpen={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
-                task={currentTask as any}
-                onSubmit={(id, data) => {
-                    onUpdate?.(id, data);
-                    setIsEditModalOpen(false);
-                }}
-            />
-
-            <DeleteConfirmationModal
-                isOpen={isDeleteModalOpen}
-                onClose={() => setIsDeleteModalOpen(false)}
-                onConfirm={() => {
-                    onDelete?.(currentTask._id);
-                    setIsDeleteModalOpen(false);
-                }}
-                taskTitle={currentTask.title}
-            />
+            </main>
         </div>
     );
 };

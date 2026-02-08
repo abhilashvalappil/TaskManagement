@@ -3,10 +3,17 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "../schemas/auth/authSchema";
 import type { RegisterFormData } from "../schemas/auth/authSchema";
-import { signUp } from "../api/auth/authService";
+import { signUp, googleSignIn } from "../api/auth/authService";
 import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/slices/authSlice";
 
-const Registeration: React.FC = () => {
+const Registration: React.FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [serverError, setServerError] = React.useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -15,25 +22,38 @@ const Registeration: React.FC = () => {
     resolver: zodResolver(registerSchema),
   });
 
-  const navigate = useNavigate();
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      setServerError(null);
+      if (credentialResponse.credential) {
+        const res = await googleSignIn(credentialResponse.credential);
+        if (res.success) {
+          dispatch(setUser(res.user));
+          navigate("/dashboard", { replace: true });
+        }
+      }
+    } catch (error: any) {
+      console.error("Google sign in failed:", error);
+      const message = error.response?.data?.error || "Google sign in failed. Please try again.";
+      setServerError(message);
+    }
+  };
 
-//   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const { name, value } = e.target;
-//     setFormData(prev => ({ ...prev, [name]: value }));
-//   };
-
-  
-
-  const onSubmit = async(data: RegisterFormData) => {
-    console.log(data);
-    const res = await signUp(data)
-    if(res.success){
-        navigate('/verify-otp',{
+  const onSubmit = async (data: RegisterFormData) => {
+    try {
+      setServerError(null);
+      const res = await signUp(data)
+      if (res.success) {
+        navigate('/verify-otp', {
           state: {
             email: data.email,
             expiresIn: res.expiresIn
           }
         })
+      }
+    } catch (error: any) {
+      const message = error.response?.data?.error || "Registration failed. Please try again.";
+      setServerError(message);
     }
   };
 
@@ -44,6 +64,12 @@ const Registeration: React.FC = () => {
         <p className="subtitle">
           Create account and start managing your tasks
         </p>
+
+        {serverError && (
+          <div className="server-error">
+            {serverError}
+          </div>
+        )}
 
         <div className="input-group">
           <label>Full Name</label>
@@ -90,10 +116,28 @@ const Registeration: React.FC = () => {
         <button type="submit" className="btn primary-btn" disabled={isSubmitting}>
           {isSubmitting ? "Creating..." : "Create Account"}
         </button>
+
+        <div className="divider">
+          <span>OR</span>
+        </div>
+
+        <div className="google-login-wrapper">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => console.log("Google login failed")}
+            width="100%"
+          />
+        </div>
+
+        <p className="footer-text">
+          Already have an account?{" "}
+          <span className="link" onClick={() => navigate("/")}>
+            Sign In
+          </span>
+        </p>
       </form>
     </div>
   );
 };
- 
 
-export default Registeration;
+export default Registration;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import CreateTaskModal from "../components/CreateTaskModal";
-import { getTasks, createTask, updateTask, deleteTask } from "../api/tasks/taskService";
+import { getTasks, createTask, updateTask, deleteTask, completeTask } from "../api/tasks/taskService";
 import TaskDetails from "./TaskDetails";
 
 interface Task {
@@ -68,8 +68,8 @@ const Tasks: React.FC = () => {
     const handleUpdateTask = async (taskId: string, taskData: any) => {
         try {
             await updateTask(taskId, taskData);
-            fetchTasks(); 
-            setSelectedTask(null); 
+            fetchTasks();
+            setSelectedTask(null);
         } catch (error) {
             console.error("Failed to update task", error);
         }
@@ -78,10 +78,20 @@ const Tasks: React.FC = () => {
     const handleDeleteTask = async (taskId: string) => {
         try {
             await deleteTask(taskId);
-            fetchTasks(); 
-            setSelectedTask(null); 
+            fetchTasks();
+            setSelectedTask(null);
         } catch (error) {
             console.error("Failed to delete task", error);
+        }
+    };
+
+    const handleMarkComplete = async (taskId: string) => {
+        try {
+            await completeTask(taskId);
+            fetchTasks();
+            setSelectedTask(null);
+        } catch (error) {
+            console.error("Failed to complete task", error);
         }
     };
 
@@ -120,6 +130,18 @@ const Tasks: React.FC = () => {
             priorityFilter === "all" || task.priority === priorityFilter;
         return matchesSearch && matchesStatus && matchesPriority;
     });
+
+    if (selectedTask) {
+        return (
+            <TaskDetails
+                task={selectedTask as any}
+                onBack={() => setSelectedTask(null)}
+                onDelete={handleDeleteTask}
+                onUpdate={handleUpdateTask}
+                onMarkComplete={handleMarkComplete}
+            />
+        );
+    }
 
     return (
         <div className="dashboard-layout">
@@ -228,26 +250,6 @@ const Tasks: React.FC = () => {
                     onSubmit={handleCreateTask}
                 />
             </main>
-
-            {selectedTask && (
-                <div className="task-details-overlay" style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: '#fff',
-                    zIndex: 1001,
-                    overflowY: 'auto'
-                }}>
-                    <TaskDetails
-                        task={selectedTask as any}
-                        onBack={() => setSelectedTask(null)}
-                        onDelete={handleDeleteTask}
-                        onUpdate={handleUpdateTask}
-                    />
-                </div>
-            )}
         </div>
     );
 };

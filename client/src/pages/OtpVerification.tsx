@@ -2,27 +2,30 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import OtpInput from '../components/OtpInput';
 import { verifyOtp } from '../api/auth/authService';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../redux/slices/authSlice';
 import '../styles/OtpVerification.css';
 
 interface LocationState {
     email: string;
-    expiresIn?: number;  
+    expiresIn?: number;
 }
 
 const OtpVerification: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const state = location.state as LocationState;
 
     // Use state email or fallback (should ideally always have email)
     const email = state?.email || '';
     const expiresIn = state?.expiresIn || 0;
- 
+
     const [otp, setOtp] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | undefined>(undefined);
     const [successMessage, setSuccessMessage] = useState<string | undefined>(undefined);
-    const [timer, setTimer] = useState<number>(expiresIn); 
+    const [timer, setTimer] = useState<number>(expiresIn);
     const [canResend, setCanResend] = useState<boolean>(false);
 
     useEffect(() => {
@@ -63,9 +66,10 @@ const OtpVerification: React.FC = () => {
         try {
             const response = await verifyOtp({ email, otp });
             if (response.success) {
+                dispatch(setUser(response.user));
                 setSuccessMessage('Email verified successfully! Redirecting...');
                 setTimeout(() => {
-                    navigate('/dashboard');  
+                    navigate('/dashboard', { replace: true });
                 }, 1500);
             } else {
                 setError(response.message || 'Verification failed. Please try again.');
@@ -93,9 +97,9 @@ const OtpVerification: React.FC = () => {
     };
 
     const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
     return (

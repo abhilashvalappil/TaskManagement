@@ -1,13 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import API from "../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/slices/authSlice";
+import { getAnalytics, getTasks } from "../api/tasks/taskService";
 
 interface StatCardProps {
     title: string;
-    value: number;
+    value: number | string;
     color: string;
 }
 
@@ -35,7 +36,7 @@ const ProgressItem: React.FC<ProgressItemProps> = ({ label, value }) => {
 };
 
 interface Task {
-    id: number;
+    _id: string;
     title: string;
     status: "pending" | "in-progress" | "completed";
     priority: "low" | "medium" | "high";
@@ -43,40 +44,52 @@ interface Task {
 }
 
 const Dashboard: React.FC = () => {
-    // Mock data
-    const stats = {
-        total: 1,
-        completed: 0,
-        inProgress: 0,
-        pending: 1,
-    };
+    const [analytics, setAnalytics] = useState<any>(null);
+    const [recentTasks, setRecentTasks] = useState<Task[]>([]);
+    const [loading, setLoading] = useState(true);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-useEffect(() => {
-  const loadUser = async () => {
-    try {
-      const res = await API.get("/auth/me");  
-      dispatch(setUser(res.data.user));
-    } catch {
-      navigate("/login");
-    }
-  };
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Load User
+                const userRes = await API.get("/auth/me");
+                dispatch(setUser(userRes.data.user));
 
-  loadUser();
-}, [dispatch, navigate]);
+                // Load Analytics & Tasks
+                const [analyticsData, tasksData] = await Promise.all([
+                    getAnalytics(),
+                    getTasks()
+                ]);
 
+                setAnalytics(analyticsData);
+                setRecentTasks(tasksData.slice(0, 5)); // Show latest 5 tasks
+            } catch (error) {
+                console.error("Dashboard data fetch failed:", error);
+                navigate("/");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const recentTasks: Task[] = [
-        {
-            id: 1,
-            title: "Complete project documentation",
-            status: "pending",
-            priority: "high",
-            dueDate: "2026-02-10",
-        },
-    ];
+        fetchData();
+    }, [dispatch, navigate]);
+
+    const getStats = () => {
+        if (!analytics) return { total: 0, completed: 0, inProgress: 0, pending: 0 };
+
+        const total = analytics.totalTasks?.[0]?.count || 0;
+        const completed = analytics.completedTasks?.[0]?.count || 0;
+        const inProgress = analytics.byStatus?.find((s: any) => s._id === "in-progress")?.count || 0;
+        const pending = analytics.byStatus?.find((s: any) => s._id === "pending")?.count || 0;
+
+        return { total, completed, inProgress, pending };
+    };
+
+    const stats = getStats();
+    const completionRate = stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
 
     const getStatusBadgeClass = (status: string) => {
         switch (status) {
@@ -107,6 +120,17 @@ useEffect(() => {
     const handleNavigateToTasks = () => {
         navigate("/tasks");
     };
+
+    if (loading) {
+        return (
+            <div className="dashboard-layout">
+                <Sidebar />
+                <main className="dashboard-main">
+                    <div className="loading-state">Loading dashboard...</div>
+                </main>
+            </div>
+        );
+    }
 
     return (
         <div className="dashboard-layout">
@@ -140,14 +164,14 @@ useEffect(() => {
                             <div className="progress-bar-container">
                                 <div
                                     className="progress-bar"
-                                    style={{ width: "0%" }}
+                                    style={{ width: `${completionRate}%` }}
                                 ></div>
                             </div>
-                            <p className="progress-percentage">0%</p>
+                            <p className="progress-percentage">{completionRate}%</p>
 
                             <div className="progress-details">
-                                <ProgressItem label="Completed Tasks" value="0 / 1" />
-                                <ProgressItem label="In Progress" value="0 / 1" />
+                                <ProgressItem label="Completed Tasks" value={`${stats.completed} / ${stats.total}`} />
+                                <ProgressItem label="In Progress" value={`${stats.inProgress} / ${stats.total}`} />
                             </div>
                         </div>
                     </div>
@@ -168,27 +192,31 @@ useEffect(() => {
                         </div>
 
                         <div className="tasks-list">
-                            {recentTasks.map((task) => (
-                                <div
-                                    key={task.id}
-                                    className="task-card"
-                                    onClick={handleNavigateToTasks}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    <div className="task-header">
-                                        <h3 className="task-title">{task.title}</h3>
-                                        <div className="task-badges">
-                                            <span className={`badge ${getStatusBadgeClass(task.status)}`}>
-                                                {task.status}
-                                            </span>
-                                            <span className={`badge ${getPriorityBadgeClass(task.priority)}`}>
-                                                {task.priority}
-                                            </span>
+                            {recentTasks.length === 0 ? (
+                                <p className="empty-placeholder">No recent tasks</p>
+                            ) : (
+                                recentTasks.map((task) => (
+                                    <div
+                                        key={task._id}
+                                        className="task-card"
+                                        onClick={handleNavigateToTasks}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        <div className="task-header">
+                                            <h3 className="task-title">{task.title}</h3>
+                                            <div className="task-badges">
+                                                <span className={`badge ${getStatusBadgeClass(task.status)}`}>
+                                                    {task.status.replace("-", " ")}
+                                                </span>
+                                                <span className={`badge ${getPriorityBadgeClass(task.priority)}`}>
+                                                    {task.priority}
+                                                </span>
+                                            </div>
                                         </div>
+                                        <p className="task-due-date">Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "Not set"}</p>
                                     </div>
-                                    <p className="task-due-date">Due: {task.dueDate}</p>
-                                </div>
-                            ))}
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>
