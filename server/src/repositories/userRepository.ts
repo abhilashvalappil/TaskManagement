@@ -11,15 +11,18 @@ class UserRepository implements IUserRepository {
         const newUser = new UserModel(user);
         return await newUser.save();
     }
-         
+
     async findByEmail(email: string): Promise<IUser | null> {
         return await UserModel.findOne({ email });
     }
-    
+
     async update(id: Types.ObjectId, user: Partial<IUser>): Promise<IUser | null> {
         return await UserModel.findByIdAndUpdate(id, user, { new: true });
     }
-        
+
+    async findById(id: string): Promise<IUser | null> {
+        return await UserModel.findById(id);
+    }
 }
 
 
