@@ -64,10 +64,14 @@ export class TaskService implements ITaskService {
             ...(updateData.assignees !== undefined && { assignees: updateData.assignees }),
             attachments: finalAttachments,
         };
-    return await this.taskRepository.updateTask(taskId, userId,payload);
+        return await this.taskRepository.updateTask(taskId, userId,payload);
     }
 
     async deleteTask(taskId: string, userId: string): Promise<boolean> {
         return await this.taskRepository.deleteTask(taskId, userId);
+    }
+
+    async getAnalytics(userId: string): Promise<any> {
+        return await this.taskRepository.getAnalytics(userId);
     }
 }

@@ -1,11 +1,15 @@
 
 import bcrypt from "bcrypt";
+import { Types } from "mongoose";
 import { otpGenerator } from "../utils/otpGenerator";
 import transporter from "../config/nodeMailerConfig";
 import { IUserRepository } from "../interfaces/repositoryInterfaces/IUserRepository";
 import { IAuthService } from "../interfaces/serviceInterfaces/IAuthService";
 import { IJwtService } from "../interfaces/serviceInterfaces/IJwtService";
 import { SignInResult, VerifyOtpResult } from "../types/authTypes";
+import { OAuth2Client } from "google-auth-library";
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export class AuthService implements IAuthService {
     private userRepository: IUserRepository;
@@ -123,6 +127,48 @@ export class AuthService implements IAuthService {
         if (!isMatch) {
             throw new Error("Invalid password");
         }
+        const accessToken = this.jwtService.generateAccessToken(user._id.toString());
+        const refreshToken = this.jwtService.generateRefreshToken(user._id.toString());
+
+        return {
+            accessToken,
+            refreshToken,
+            user: {
+                id: user._id.toString(),
+                email: user.email,
+                fullName: user.fullName,
+            }
+        };
+    }
+
+    async googleSignIn(token: string): Promise<SignInResult> {
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID as string,
+        });
+
+        const payload = ticket.getPayload();
+        if (!payload || !payload.email) {
+            throw new Error("Invalid Google token");
+        }
+
+        const { email, name } = payload;
+        let user = await this.userRepository.findByEmail(email);
+
+        if (user && !user.isGoogleAuth) {
+            throw new Error("This email is already registered with a password. Please sign in using your email and password.");
+        }
+
+        if (!user) {
+            user = await this.userRepository.create({
+                fullName: name || "Google User",
+                email: email,
+                isVerified: true,
+                isGoogleAuth: true,
+            });
+        } else if (!user.isVerified) {
+            await this.userRepository.update(user._id, { isVerified: true });
+        }
 
         const accessToken = this.jwtService.generateAccessToken(user._id.toString());
         const refreshToken = this.jwtService.generateRefreshToken(user._id.toString());
@@ -135,6 +181,36 @@ export class AuthService implements IAuthService {
                 email: user.email,
                 fullName: user.fullName,
             }
+        };
+    }
+
+    async getUserById(userId: string): Promise<any> {
+        const user = await this.userRepository.findById(userId);
+        if (!user) {
+            throw new Error("User not found");
+        }
+        return {
+            id: user._id.toString(),
+            email: user.email,
+            fullName: user.fullName,
+        };
+    }
+
+    async updateProfile(userId: string, fullName: string): Promise<any> {
+        const user = await this.userRepository.findById(userId);
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        const updatedUser = await this.userRepository.update(new Types.ObjectId(userId), { fullName });
+        if (!updatedUser) {
+            throw new Error("Failed to update profile");
+        }
+
+        return {
+            id: updatedUser._id.toString(),
+            email: updatedUser.email,
+            fullName: updatedUser.fullName,
         };
     }
 }
