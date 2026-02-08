@@ -15,4 +15,6 @@ taskRouter.post('/',authMiddleware,upload.array('attachments', 10),taskControlle
 taskRouter.get('/',authMiddleware,taskController.getTasks.bind(taskController))
 taskRouter.put('/:id',authMiddleware,upload.array('attachments', 10),taskController.updateTask.bind(taskController))
 taskRouter.delete('/:id',authMiddleware,taskController.deleteTask.bind(taskController))
+taskRouter.get('/analytics',authMiddleware,taskController.getAnalytics.bind(taskController))
+
 export default taskRouter;

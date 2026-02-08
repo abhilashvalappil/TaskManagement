@@ -18,11 +18,9 @@ const authController = new AuthController(authService,cookieHandlerService)
 userRouter.post('/auth/signup',authController.signUp.bind(authController));
 userRouter.post('/auth/verify-otp',authController.verifyOtp.bind(authController));
 userRouter.post('/auth/signin',authController.signIn.bind(authController));
-userRouter.get("/auth/me", authMiddleware, (req: AuthRequest, res) => {
-  res.status(200).json({
-    success: true,
-    user: req.user,
-  });
-});
+userRouter.post('/auth/google',authController.googleSignIn.bind(authController));
+userRouter.post('/auth/logout',authController.logout.bind(authController));
+userRouter.get("/auth/me",authMiddleware,authController.getMe.bind(authController));
+userRouter.put("/auth/update-profile",authMiddleware,authController.updateProfile.bind(authController));
 
 export default userRouter;
