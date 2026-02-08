@@ -18,3 +18,9 @@ export interface SignInResult {
     fullName: string;
   };
 }
+
+export interface UserResponse {
+    id: string;
+    email: string;
+    fullName: string;
+}

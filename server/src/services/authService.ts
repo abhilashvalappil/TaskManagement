@@ -6,7 +6,7 @@ import transporter from "../config/nodeMailerConfig";
 import { IUserRepository } from "../interfaces/repositoryInterfaces/IUserRepository";
 import { IAuthService } from "../interfaces/serviceInterfaces/IAuthService";
 import { IJwtService } from "../interfaces/serviceInterfaces/IJwtService";
-import { SignInResult, VerifyOtpResult } from "../types/authTypes";
+import { SignInResult, UserResponse, VerifyOtpResult } from "../types/authTypes";
 import { OAuth2Client } from "google-auth-library";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -184,7 +184,7 @@ export class AuthService implements IAuthService {
         };
     }
 
-    async getUserById(userId: string): Promise<any> {
+    async getUserById(userId: string): Promise<UserResponse> {
         const user = await this.userRepository.findById(userId);
         if (!user) {
             throw new Error("User not found");
